@@ -1,89 +1,58 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useForm } from "@mantine/form";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+import { signUpApi } from "../services/api/Auth";
 
 export default function RegisterForm() {
-  const [registerData, setRegisterData] = useState({
-    name: "",
-    handle: "",
-    email: "",
-    password: "",
+  const navigate = useNavigate()
+  const { onSubmit, getInputProps } = useForm({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
   });
-  const { status, isLoggedIn } = {status: "loading", isLoggedIn: true} // useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+  const { mutate, isLoading } = useMutation({
+    mutationFn: signUpApi,
+    onError: (error) => {
+        console.log(error)
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("user", JSON.stringify(data.data.admin));
+      navigate("/home");
+    },
+  });
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      // history.push("/");
-    }
-  }, [isLoggedIn, history]);
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit((values) => mutate(values))}>
       <TextField
-        onChange={(e) =>
-          setRegisterData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-          }))
-        }
-        name="name"
+        {...getInputProps("name")}
         sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
         variant="outlined"
-        label="Enter full name"
+        label="Name"
         type="text"
         required
       />
       <TextField
-        name="handle"
-        onChange={(e) =>
-          setRegisterData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-          }))
-        }
+        {...getInputProps("email")}
         sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
         variant="outlined"
-        label="Choose an handle"
-        type="text"
-        required
-      />
-      <TextField
-        name="email"
-        onChange={(e) =>
-          setRegisterData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-          }))
-        }
-        sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
-        variant="outlined"
-        label="Enter Email"
+        label="Email"
         type="email"
         required
       />
       <TextField
-        name="password"
-        onChange={(e) =>
-          setRegisterData((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-          }))
-        }
+        {...getInputProps("password")}
         sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
         variant="outlined"
-        label="Enter Password"
+        label="Password"
         type="password"
         required
       />
       <Button
-        disabled={
-          registerData.email.trimStart().length === 0 ||
-          registerData.password.trimStart().length === 0 ||
-          registerData.handle.trimStart().length === 0 ||
-          registerData.name.trimStart().length === 0
-        }
         type="submit"
         sx={{
           width: "100%",
@@ -94,7 +63,7 @@ export default function RegisterForm() {
         variant="contained"
         color="primary"
       >
-        {status === "loading" ? (
+        {isLoading ? (
           <CircularProgress size={24} sx={{ color: "#FFF" }} />
         ) : (
           "Register"
