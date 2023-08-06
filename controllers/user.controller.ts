@@ -43,4 +43,44 @@ export default {
         .send(err.message || "Something went wrong!");
     }
   },
+  login: async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw utils.generateErrorInstance({
+          status: 400,
+          message: "Required fields can't be empty!",
+        });
+      }
+
+      let user = await Users.findOne({ email });
+      if (!user) {
+        throw utils.generateErrorInstance({
+          status: 404,
+          message: "User not found!",
+        });
+      }
+
+      const passwordMatched = await bcrypt.compare(password, user.password);
+      if (!passwordMatched) {
+        throw utils.generateErrorInstance({
+          status: 401,
+          message: "Invalid Password",
+        });
+      }
+
+      user = user.toJSON()
+      user.password = "";
+
+      const token = jwt.sign(user, config.jwtSecret);
+
+      return res.status(200).send({ user, token });
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
 };
