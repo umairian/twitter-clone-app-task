@@ -1,32 +1,41 @@
 import { Button, CircularProgress, TextField } from "@mui/material";
-import React, { useState } from "react";
+import { useForm } from "@mantine/form";
+import { useNavigate } from "react-router";
+import { loginApi } from "../services/api/Auth";
+import { useMutation } from "@tanstack/react-query";
 
 export default function LoginForm() {
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const navigate = useNavigate()
+  const { onSubmit, getInputProps } = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-  const loginAsGuest = () => {
-    setLoginData({ email: "tomato@mail.com", password: "tomato" });
-  };
-  
+  const { mutate, isLoading } = useMutation({
+    mutationFn: loginApi,
+    onError: (error) => {
+        console.log(error)
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("user", JSON.stringify(data.data.admin));
+      navigate("/home");
+    },
+  });
+
+
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit((values) => mutate(values))}>
         <TextField
-          onChange={(e) =>
-            setLoginData((prev) => ({
-              ...prev,
-              [e.target.name]: e.target.value,
-            }))
-          }
           sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
           variant="outlined"
           label="Enter Email"
           type="email"
           required
-          name="email"
+          {...getInputProps("email")}
         />
         <TextField
           sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
@@ -34,19 +43,9 @@ export default function LoginForm() {
           label="Enter Password"
           type="password"
           required
-          onChange={(e) =>
-            setLoginData((prev) => ({
-              ...prev,
-              [e.target.name]: e.target.value,
-            }))
-          }
-          name="password"
+          {...getInputProps("password")}
         />
         <Button
-          disabled={
-            loginData.email.trimStart().length === 0 ||
-            loginData.password.trimStart().length === 0
-          }
           sx={{
             width: "100%",
             margin: "1.5rem 0",
@@ -57,26 +56,13 @@ export default function LoginForm() {
           color="primary"
           type="submit"
         >
-          {status === "loading" ? (
+          {isLoading ? (
             <CircularProgress size={24} sx={{ color: "#FFF" }} />
           ) : (
             "Login"
           )}
         </Button>
       </form>
-      <Button
-        onClick={loginAsGuest}
-        sx={{
-          width: "100%",
-          margin: ".5rem 0 1rem 0.5rem",
-          padding: "12px 0",
-          borderRadius: "28px",
-        }}
-        variant="outlined"
-        color="primary"
-      >
-        {status === "loading" ? "Logging in..." : "Login as guest"}
-      </Button>
     </>
   );
 }

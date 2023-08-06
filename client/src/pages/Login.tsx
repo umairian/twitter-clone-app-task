@@ -1,13 +1,12 @@
-import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import LoginForm from "../components/LoginForm";
-import RegisterForm from "../components/RegisterForm";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import { useNavigate } from "react-router";
 
 export default function Login() {
-  const [isLoginForm, setIsLoginForm] = useState(true);
+  const navigate = useNavigate()
   const theme = useTheme();
   return (
     <Box
@@ -28,35 +27,24 @@ export default function Login() {
         }}
       >
         <Box textAlign="center" marginBottom="1rem">
-          <img src="/logo.png" alt="Logo" />
+        <Typography variant="h4" component={"h4"}>
+            Twitter Clone App
+          </Typography>
+          <Typography variant="h6" component={"h6"}>
+            Login to your account
+          </Typography>
         </Box>
-        {isLoginForm ? (
-          <Typography variant="h5">Login to your account</Typography>
-        ) : (
-          <Typography variant="h5">Create a new account</Typography>
-        )}
-        {isLoginForm ? <LoginForm /> : <RegisterForm />}
-        {isLoginForm ? (
+        <LoginForm />
           <Box textAlign="center" margin=".5rem 0">
             Don't have an account?{" "}
             <Link
               style={{ textDecoration: "none", cursor: "pointer" }}
-              onClick={() => setIsLoginForm(false)}
+              onClick={() => navigate("/signup")}
             >
               Create one
             </Link>
           </Box>
-        ) : (
-          <Box textAlign="center" margin=".5rem 0">
-            Already registered?{" "}
-            <Link
-              style={{ textDecoration: "none", cursor: "pointer" }}
-              onClick={() => setIsLoginForm(true)}
-            >
-              Sign in
-            </Link>
-          </Box>
-        )}
+        
       </Box>
     </Box>
   );
