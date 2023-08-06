@@ -1,5 +1,5 @@
 import { Router } from "express";
-const router = Router();
+const router: Router = Router();
 
 // Controllers
 import controller from "../controllers/user.controller";
@@ -12,6 +12,7 @@ import authenticateUser from "../middlewares/authenticateUser";
 
 router.post("/", controller.create);
 router.post("/login", controller.login);
+router.get("/:userId/profile", authenticateUser, controller.profile);
 router.use("/:userId/posts", authenticateUser, postRouter);
 
 export default router;

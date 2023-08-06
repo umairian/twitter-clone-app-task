@@ -24,6 +24,15 @@ const userSchema = new Schema(
     profileUrl: {
       type: String,
     },
+    posts: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+    },
+    followers: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    },
+    following: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    },
   },
   {
     timestamps: true,

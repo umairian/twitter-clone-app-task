@@ -83,4 +83,18 @@ export default {
         .send(err.message || "Something went wrong!");
     }
   },
+  profile: async (req: Request, res: Response) => {
+    try {
+      const { user } = req;
+
+      const profile = await Users.findById(user._id).populate("posts").populate("followers").populate("following")
+
+      return res.status(200).send({ profile });
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
 };

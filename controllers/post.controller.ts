@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Posts from "../models/post.model";
+import Users from "../models/user.model";
 import utils from "../utils";
 
 export default {
@@ -17,7 +18,13 @@ export default {
       const post = await Posts.create({
         text,
         author: req.user._id,
-      })
+      });
+
+      await Users.findByIdAndUpdate(
+        req.user._id,
+        { $push: { posts: post._id } },
+        { new: true, useFindAndModify: false }
+      );
 
       return res.status(200).send({ post });
     } catch (err: any) {
