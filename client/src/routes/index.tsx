@@ -1,3 +1,4 @@
+import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 
@@ -23,6 +24,14 @@ export const routes: CustomRoute[] = [
     path: "/signup",
     component: <Signup />,
     private: false,
+  },
+  
+  {
+    name: "Home",
+    key: "home",
+    path: "/home",
+    component: <Home />,
+    private: true,
   },
 ];
 

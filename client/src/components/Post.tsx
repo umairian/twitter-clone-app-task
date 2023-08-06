@@ -83,7 +83,7 @@ export default function Post({ post, profile }) {
         >
           <Grid container flexWrap="nowrap">
             <Grid item sx={{ paddingRight: "1rem" }}>
-              <Link to={`/profile/${post.author._id}`}>
+              <Link to={`/profile/${post._id}`}>
                 <img src="/logo.png" alt="lgoog" width="50px" />
               </Link>
             </Grid>
@@ -100,12 +100,12 @@ export default function Post({ post, profile }) {
                       <Typography
                         sx={{ fontSize: "16px", fontWeight: 500, mr: "6px" }}
                       >
-                        {post.author.name}
+                        {post._id}
                       </Typography>
                       <Typography
                         sx={{ fontSize: "15px", mr: "6px", color: "#555" }}
                       >
-                        @{post.author.handle}
+                        @{post._id}
                       </Typography>
                       <Typography
                         sx={{ fontSize: "15px", mr: "6px", color: "#555" }}
@@ -125,7 +125,7 @@ export default function Post({ post, profile }) {
                     </Box>
                   </Grid>
                   <Grid item>
-                    {post.author._id === _id && (
+                    {post._id === _id && (
                       <IconButton
                         aria-expanded={open ? "true" : undefined}
                         onClick={(e) => {

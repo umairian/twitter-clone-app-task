@@ -1,12 +1,12 @@
 import { CircularProgress, Grid, IconButton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect } from "react";
 import AssistantIcon from "@mui/icons-material/Assistant";
 import Post from "../components/Post";
 import AddPost from "../components/AddPost";
 
 export default function Home() {
-  const { status, posts } = useSelector((state) => state.post);
+  const posts = [{_id: 123, text: "Somethigns", isLiked: true, createdAt: Date.now()}]
+  const status = "success"
 
   return (
     <Box>
@@ -30,7 +30,7 @@ export default function Home() {
           )}
         </Box>
         {status === "success" &&
-          posts.map((post) => <Post key={post._id} post={post} />)}
+          posts.map((post) => <Post key={post._id} post={post} profile={"profile"} />)}
       </Box>
     </Box>
   );

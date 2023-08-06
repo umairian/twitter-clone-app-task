@@ -9,6 +9,15 @@ const app: Application = express();
 
 connect();
 
+
+declare global {
+    namespace Express {
+      interface Request {
+        user: any;
+      }
+    }
+  }
+
 // Parsing Request Bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
