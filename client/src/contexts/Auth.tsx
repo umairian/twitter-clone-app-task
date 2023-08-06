@@ -1,12 +1,16 @@
 import { createContext } from "react";
 
-interface DynamicObject {
-    [key: string]: string | number | null;
+export interface UserI {
+    _id: string;
+    name: string;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
   }
 
 interface AuthContextDefaultValue {
     token: string | null;
-    user: DynamicObject | string | null;
+    user: UserI | string | null;
 }
 
 const defaultValue: AuthContextDefaultValue = {

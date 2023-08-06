@@ -21,7 +21,7 @@ export default function RegisterForm() {
     },
     onSuccess: (data) => {
       localStorage.setItem("token", data.data.token);
-      localStorage.setItem("user", JSON.stringify(data.data.admin));
+      localStorage.setItem("user", JSON.stringify(data.data.user));
       navigate("/home");
     },
   });
