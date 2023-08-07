@@ -21,6 +21,7 @@ export default function AddPost() {
     },
     onSuccess: (data) => {
       console.log(data);
+      setPostText("")
       queryClient.invalidateQueries("profile");
     },
   });

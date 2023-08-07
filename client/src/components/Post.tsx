@@ -1,28 +1,25 @@
 import {
   Grid,
   IconButton,
-  Input,
   Typography,
   Menu,
   MenuItem,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import React, { useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import SyncIcon from "@mui/icons-material/Sync";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import { Link } from "react-router-dom";
-import Modal from "./Modal";
 import { AuthContext, UserI } from "../contexts/Auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deletePostApi } from "../services/api/Post";
+import { deletePostApi, likePostApi } from "../services/api/Post";
 
 export default function Post({ post, profile }) {
-  const [commentText, setCommentText] = useState("");
+  const [isLiked, setIsLiked] = useState(false)
 
   const queryClient = useQueryClient();
 
@@ -33,6 +30,18 @@ export default function Post({ post, profile }) {
     },
     onSuccess: (data) => {
       console.log(data);
+      queryClient.invalidateQueries("profile");
+    },
+  });
+
+  const { mutate: likeMutate } = useMutation({
+    mutationFn: likePostApi,
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      setIsLiked(true)
       queryClient.invalidateQueries("profile");
     },
   });
@@ -52,17 +61,7 @@ export default function Post({ post, profile }) {
 
   const handleLike = async (e) => {
     e.preventDefault();
-    // dispatch(updateLike({ id: post._id }));
-    const response = { message: "123" }; // await likeOrDislikePost({ id: post._id });
-    if (response.message !== "Post updated successfully.") {
-      // dispatch(updateLike({ id: post._id }));
-    }
-  };
-  const handleAddComment = async () => {
-    const response = true; // await addComment({ id: post._id, text: commentText });
-    if (response) {
-      setCommentText("");
-    }
+    likeMutate({ userId: user._id, token, postId: post?._id })
   };
 
   const handleDeletePost = async (e) => {
@@ -72,14 +71,12 @@ export default function Post({ post, profile }) {
     mutate({ userId: user._id, token, postId: post?._id });
   };
 
-  const [openModal, setOpenModal] = React.useState(false);
-  const handleModalClose = () => {
-    setOpenModal(false);
-  };
-
-  const handleModalOpen = () => {
-    setOpenModal(true);
-  };
+  useEffect(() => {
+    if(post.likes.includes(user?._id)) {
+      setIsLiked(true)
+    }
+  }, [])
+  
   return (
     <>
       <Link
@@ -171,24 +168,15 @@ export default function Post({ post, profile }) {
                   marginRight="5rem"
                   marginTop=".8rem"
                 >
-                  <IconButton
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleModalOpen();
-                    }}
-                    size="small"
-                  >
-                    <ChatBubbleOutlineIcon fontSize="small" />
-                  </IconButton>
                   <IconButton size="small">
                     <SyncIcon fontSize="small" />
                   </IconButton>
                   <IconButton onClick={handleLike} size="small">
-                    {post.isLiked ? (
+                    {isLiked ? (
                       <FavoriteIcon fontSize="small" />
                     ) : (
                       <FavoriteBorderIcon fontSize="small" />
-                    )}
+                    )} <small style={{ marginLeft: 5}}>{post.likes.length}</small>
                   </IconButton>
                   <IconButton size="small">
                     <IosShareIcon fontSize="small" />
@@ -199,37 +187,6 @@ export default function Post({ post, profile }) {
           </Grid>
         </Box>
       </Link>
-      {openModal && (
-        <Modal
-          open={openModal}
-          handleClose={handleModalClose}
-          saveText={"Comment"}
-          len={commentText.trimStart().length}
-          handleSave={handleAddComment}
-        >
-          <Box>
-            <Grid container>
-              <Grid item>
-                <img src="/logo.png" alt="logo" width="60px" />
-              </Grid>
-              <Grid item flexGrow="1">
-                <Box padding=".5rem 0">
-                  <Input
-                    onChange={(e) => setCommentText(e.target.value)}
-                    value={commentText}
-                    multiline
-                    rows="2"
-                    disableUnderline
-                    type="text"
-                    placeholder="Post your comment"
-                    sx={{ width: "100%" }}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        </Modal>
-      )}
     </>
   );
 }

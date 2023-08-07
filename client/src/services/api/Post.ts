@@ -31,3 +31,20 @@ export function deletePostApi({
       },
     });
   }
+
+  
+export function likePostApi({
+    userId,
+    token,
+    postId,
+  }: {
+    userId: string;
+    token: string | null;
+    postId: string;
+  }) {
+    return axiosInstance.put(`/users/${userId}/posts/${postId}/like?like=1`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }

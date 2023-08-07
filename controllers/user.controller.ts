@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Users from "../models/user.model";
+import Posts from "../models/post.model";
 import Followers from "../models/follower.model";
 import utils from "../utils";
 import bcrypt from "bcryptjs";
@@ -99,7 +100,7 @@ export default {
           options: { sort: { createdAt: "desc" } },
         })
         .populate("followers")
-        .populate("following");
+       
 
       const isFollowing = profile?.followers.find(
         (follower) => follower._id.toString() === req.user._id.toString()
@@ -157,6 +158,20 @@ export default {
       ]);
 
       return res.status(200).send("Successfull");
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
+  home: async (req: Request, res: Response) => {
+    try {
+      const posts = await Posts.find({
+        author: req.user.following
+      }).sort({ createdAt: "desc" }).populate("author")
+
+      return res.status(200).send({ posts });
     } catch (err: any) {
       console.log(err);
       return res

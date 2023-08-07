@@ -39,3 +39,15 @@ export function followUserApi({
       },
     });
   }
+
+  export function getHomeDataApi({
+    queryKey: [, { userId, token }],
+  }: {
+    queryKey: [string, { userId: string; token: string; }];
+  }) {
+    return axiosInstance.get(`/users/${userId}/home`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }

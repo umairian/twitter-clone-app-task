@@ -15,6 +15,7 @@ router.post("/login", controller.login);
 router.get("/:userId/searchUsers", authenticateUser, controller.search);
 router.post("/:userId/follow", authenticateUser, controller.follow);
 router.get("/:userId/profile", authenticateUser, controller.profile);
+router.get("/:userId/home", authenticateUser, controller.home);
 router.use("/:userId/posts", authenticateUser, postRouter);
 
 export default router;

@@ -52,4 +52,27 @@ export default {
         .send(err.message || "Something went wrong!");
     }
   },
+  like: async (req: Request, res: Response) => {
+    try {
+      const { postId } = req.params;
+      const { like } = req.query;
+
+      if(like === "1") {
+        await Posts.findByIdAndUpdate(postId, {
+            $push: { likes: req.user._id }
+        })
+      } else {
+        await Posts.findByIdAndUpdate(postId, {
+            $pull: { likes: req.user._id }
+        })
+      }
+
+      return res.status(200).send("Success");
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
 };

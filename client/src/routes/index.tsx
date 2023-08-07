@@ -1,5 +1,6 @@
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Logout from "../pages/Logout";
 import Profile from "../pages/Profile";
 import Signup from "../pages/Signup";
 
@@ -39,6 +40,13 @@ export const routes: CustomRoute[] = [
     key: "profile",
     path: "/profile/:userId",
     component: <Profile />,
+    private: true,
+  },
+  {
+    name: "Logout",
+    key: "logout",
+    path: "/logout",
+    component: <Logout />,
     private: true,
   },
 ];
