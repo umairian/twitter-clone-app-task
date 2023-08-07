@@ -85,14 +85,32 @@ export default {
   },
   profile: async (req: Request, res: Response) => {
     try {
-      const { user } = req;
+      const { userId } = req.query;
 
-      const profile = await Users.findById(user._id).populate({
+      const profile = await Users.findById(userId).populate({
         path: "posts",
         options: { sort: { createdAt: "desc" } },
       }).populate("followers").populate("following")
 
       return res.status(200).send({ profile });
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
+  search: async (req: Request, res: Response) => {
+    try {
+      const { query } = req;
+      const { term } = query;
+
+      const users = await Users.find({
+        _id: { $ne: req.user._id },
+        name: { $regex: term, $options: 'i' }
+      })
+
+      return res.status(200).send({ users });
     } catch (err: any) {
       console.log(err);
       return res

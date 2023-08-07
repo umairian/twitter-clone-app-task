@@ -12,7 +12,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import Post from "../components/Post";
-import { Link as RouteLink } from "react-router-dom";
+import { Link as RouteLink, useParams } from "react-router-dom";
 import { AuthContext, UserI } from "../contexts/Auth";
 import { useQuery } from "@tanstack/react-query";
 import { getProfileApi } from "../services/api/User";
@@ -22,11 +22,13 @@ export default function Profile() {
   const theme = useTheme();
 
   const context = useContext(AuthContext);
-  const user = context.user as UserI;
+  const user = context.user as UserI
   const token = context.token;
 
+  const { userId } = useParams()
+
   const { isLoading, data } = useQuery({
-    queryKey: ["profile", { token, userId: user._id }],
+    queryKey: ["profile", { token, userId: user?._id, searchId: userId }],
     queryFn: getProfileApi,
   });
 
@@ -60,7 +62,7 @@ export default function Profile() {
             </Grid>
 
             <Grid item>
-              <Typography variant="h6">{user?.name}</Typography>
+              <Typography variant="h6">{data && data.data.profile?.name}</Typography>
               <Typography sx={{ fontSize: "12px", color: "#555" }}>
                 {!isLoading && data && data.data.profile.posts.length} posts
               </Typography>{" "}
@@ -95,7 +97,7 @@ export default function Profile() {
               >
                 <img
                   width="150px"
-                  src={user?.profileUrl}
+                  src={data && data.data.profile?.profileUrl}
                   alt="profile"
                 />
               </Box>
@@ -171,9 +173,9 @@ export default function Profile() {
                 Posts
               </Typography>
             </Box>
-            {data.data.profile.posts &&
+            {data && data.data.profile.posts &&
               data.data.profile.posts.map((post) => (
-                <Post key={post._id} post={post} profile={user} />
+                <Post key={post._id} post={post} profile={data.data.profile} />
               ))}
           </Box>
         )}

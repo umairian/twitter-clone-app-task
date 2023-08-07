@@ -28,7 +28,7 @@ import { AuthContext, UserI } from "../contexts/Auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostApi } from "../services/api/Post";
 
-const links = [
+const links = (userId: string) => [
   {
     label: "Home",
     to: "/home",
@@ -36,7 +36,7 @@ const links = [
   },
   {
     label: "Profile",
-    to: "/profile",
+    to: `/profile/${userId}`,
     icon: <PersonOutlineIcon fontSize="medium" color="action" />,
   },
   {
@@ -106,7 +106,7 @@ export default function LeftSidebar() {
           </Link>
         </Box>
         <List>
-          {links.map((link) => (
+          {links(user?._id).map((link) => (
             <NavLink
               key={link.label}
               to={link.to}

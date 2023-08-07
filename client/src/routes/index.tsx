@@ -37,7 +37,7 @@ export const routes: CustomRoute[] = [
   {
     name: "Profile",
     key: "profile",
-    path: "/profile",
+    path: "/profile/:userId",
     component: <Profile />,
     private: true,
   },
