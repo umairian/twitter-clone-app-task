@@ -4,6 +4,7 @@ export interface UserI {
     _id: string;
     name: string;
     email: string;
+    profileUrl: string;
     createdAt: Date;
     updatedAt: Date;
   }

@@ -1,14 +1,18 @@
 import { Button, CircularProgress, Grid, Input } from "@mui/material";
 import { Box, useTheme } from "@mui/system";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState, useContext } from "react";
 import { addPostApi } from "../services/api/Post";
-import { AuthContext } from "../contexts/Auth";
+import { AuthContext, UserI } from "../contexts/Auth";
 
 export default function AddPost() {
   const theme = useTheme();
   const [postText, setPostText] = useState("");
-  const { token, user } = useContext(AuthContext);
+  const context = useContext(AuthContext);
+  const user = context.user as UserI;
+  const token = context.token;
+
+  const queryClient = useQueryClient();
 
   const { mutate, isLoading } = useMutation({
     mutationFn: addPostApi,
@@ -17,9 +21,9 @@ export default function AddPost() {
     },
     onSuccess: (data) => {
       console.log(data);
+      queryClient.invalidateQueries("profile");
     },
   });
-  console.log(user)
 
   const handleAddPost = async () => {
     mutate({
@@ -32,11 +36,7 @@ export default function AddPost() {
     <Box padding="1rem 1rem 0 1rem" borderBottom="1px solid #ccc">
       <Grid container>
         <Grid item sx={{ paddingRight: "1rem" }}>
-          <img
-            src="https://cdn3d.iconscout.com/3d/premium/thumb/boy-avatar-6299533-5187865.png"
-            alt="lgogo"
-            width="50px"
-          />
+          <img src={user?.profileUrl} alt="lgogo" width="50px" />
         </Grid>
         <Grid item flexGrow="1">
           <Box padding=".5rem 0">

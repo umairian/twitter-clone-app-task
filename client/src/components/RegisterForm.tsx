@@ -11,6 +11,7 @@ export default function RegisterForm() {
       name: "",
       email: "",
       password: "",
+      profileUrl: ""
     },
   });
 
@@ -50,6 +51,14 @@ export default function RegisterForm() {
         variant="outlined"
         label="Password"
         type="password"
+        required
+      />
+      <TextField
+        {...getInputProps("profileUrl")}
+        sx={{ width: "100%", margin: "1rem 0", bgcolor: "#fff" }}
+        variant="outlined"
+        label="Profile Url"
+        type="text"
         required
       />
       <Button

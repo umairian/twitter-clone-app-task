@@ -1,5 +1,6 @@
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Profile from "../pages/Profile";
 import Signup from "../pages/Signup";
 
 export interface CustomRoute {
@@ -31,6 +32,13 @@ export const routes: CustomRoute[] = [
     key: "home",
     path: "/home",
     component: <Home />,
+    private: true,
+  },
+  {
+    name: "Profile",
+    key: "profile",
+    path: "/profile",
+    component: <Profile />,
     private: true,
   },
 ];

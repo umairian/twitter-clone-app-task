@@ -84,7 +84,7 @@ export default function Post({ post, profile }) {
           <Grid container flexWrap="nowrap">
             <Grid item sx={{ paddingRight: "1rem" }}>
               <Link to={`/profile/${post._id}`}>
-                <img src="/logo.png" alt="lgoog" width="50px" />
+                <img src={profile.profileUrl} alt="lgoog" width="50px" />
               </Link>
             </Grid>
             <Grid item flexGrow="1">
@@ -100,12 +100,12 @@ export default function Post({ post, profile }) {
                       <Typography
                         sx={{ fontSize: "16px", fontWeight: 500, mr: "6px" }}
                       >
-                        {post._id}
+                        {profile.name}
                       </Typography>
                       <Typography
                         sx={{ fontSize: "15px", mr: "6px", color: "#555" }}
                       >
-                        @{post._id}
+                        @{profile.email}
                       </Typography>
                       <Typography
                         sx={{ fontSize: "15px", mr: "6px", color: "#555" }}

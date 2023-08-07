@@ -22,20 +22,6 @@ export default function RightSidebar() {
   //   dispatch(getFollowings(_id));
   // }, [dispatch, _id]);
 
-  function showToFollow() {
-    const filtered = users.filter((user) => user._id !== _id);
-
-    return filtered.filter((item) => {
-      const index = followings.findIndex(
-        (follow) => follow.followingId === item._id
-      );
-      if (index !== -1) {
-        return false;
-      }
-      return true;
-    });
-  }
-
   return (
     <Box sx={{ height: "100%" }}>
       <Box paddingTop="10px">
@@ -139,27 +125,6 @@ export default function RightSidebar() {
               ))}
             </Box>
           )}
-        </Box>
-        <Box
-          sx={{
-            background: "#eee",
-            borderRadius: "28px",
-            padding: "10px 20px",
-            margin: "1rem 0",
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Who to follow
-          </Typography>
-          <Box textAlign="center" marginTop="1rem">
-            {(userStatus === "loading" || followingStatus === "loading") && (
-              <CircularProgress size={20} color="primary" />
-            )}
-          </Box>
-          {userStatus === "success" &&
-            showToFollow()
-              .slice(0, 7)
-              .map((item) => <WhoToFollow key={item._id} user={item} />)}
         </Box>
       </Box>
     </Box>

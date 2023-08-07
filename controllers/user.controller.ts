@@ -10,7 +10,7 @@ export default {
     try {
       const { name, email, password, profileUrl } = req.body;
 
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !profileUrl) {
         throw utils.generateErrorInstance({
           status: 400,
           message: "Required fields can't be empty!",
@@ -87,7 +87,10 @@ export default {
     try {
       const { user } = req;
 
-      const profile = await Users.findById(user._id).populate("posts").populate("followers").populate("following")
+      const profile = await Users.findById(user._id).populate({
+        path: "posts",
+        options: { sort: { createdAt: "desc" } },
+      }).populate("followers").populate("following")
 
       return res.status(200).send({ profile });
     } catch (err: any) {

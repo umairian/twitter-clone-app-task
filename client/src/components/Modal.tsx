@@ -16,9 +16,8 @@ export default function Modal({
   len,
 }) {
   const theme = useTheme();
-  const handleClick = () => {
+  const handleClick = async () => {
     handleSave();
-    handleClose();
   };
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
