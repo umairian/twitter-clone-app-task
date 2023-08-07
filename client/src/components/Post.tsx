@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import SyncIcon from "@mui/icons-material/Sync";
@@ -17,9 +17,25 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import { Link } from "react-router-dom";
 import Modal from "./Modal";
+import { AuthContext, UserI } from "../contexts/Auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deletePostApi } from "../services/api/Post";
 
 export default function Post({ post, profile }) {
   const [commentText, setCommentText] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: deletePostApi,
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries("profile");
+    },
+  });
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -29,17 +45,21 @@ export default function Post({ post, profile }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const { _id } = { _id: 123 };
+
+  const context = useContext(AuthContext);
+  const user = context.user as UserI;
+  const token = context.token;
+
   const handleLike = async (e) => {
     e.preventDefault();
     // dispatch(updateLike({ id: post._id }));
-    const response = { message: "123" } // await likeOrDislikePost({ id: post._id });
+    const response = { message: "123" }; // await likeOrDislikePost({ id: post._id });
     if (response.message !== "Post updated successfully.") {
       // dispatch(updateLike({ id: post._id }));
     }
   };
   const handleAddComment = async () => {
-    const response = true // await addComment({ id: post._id, text: commentText });
+    const response = true; // await addComment({ id: post._id, text: commentText });
     if (response) {
       setCommentText("");
     }
@@ -49,14 +69,7 @@ export default function Post({ post, profile }) {
     e.stopPropagation();
     const confirmation = window.confirm("Are you sure to delete this post?");
     if (!confirmation) return;
-    const response = true; // await deletePost({ id: post._id });
-    if (response) {
-      if (profile) {
-        // dispatch(getProfile(post.author._id));
-      } else {
-        // dispatch(getPosts());
-      }
-    }
+    mutate({ userId: user._id, token, postId: post?._id });
   };
 
   const [openModal, setOpenModal] = React.useState(false);
@@ -125,7 +138,7 @@ export default function Post({ post, profile }) {
                     </Box>
                   </Grid>
                   <Grid item>
-                    {post._id === _id && (
+                    {profile?._id === user?._id && (
                       <IconButton
                         aria-expanded={open ? "true" : undefined}
                         onClick={(e) => {

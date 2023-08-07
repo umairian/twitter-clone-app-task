@@ -34,4 +34,22 @@ export default {
         .send(err.message || "Something went wrong!");
     }
   },
+  delete: async (req: Request, res: Response) => {
+    try {
+      const { postId } = req.params;
+
+      await Posts.findByIdAndDelete(postId);
+
+      await Users.findByIdAndUpdate(req.user._id, {
+        $pull: { posts: postId }
+      })
+
+      return res.status(200).send("Success");
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
 };

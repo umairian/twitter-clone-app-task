@@ -15,3 +15,19 @@ export function addPostApi({
     },
   });
 }
+
+export function deletePostApi({
+    userId,
+    token,
+    postId,
+  }: {
+    userId: string;
+    token: string | null;
+    postId: string;
+  }) {
+    return axiosInstance.delete(`/users/${userId}/posts/${postId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
