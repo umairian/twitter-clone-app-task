@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Box } from "@mui/system";
 import {
+  Avatar,
   Button,
   CircularProgress,
   Grid,
@@ -14,8 +15,8 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import Post from "../components/Post";
 import { Link as RouteLink, useParams } from "react-router-dom";
 import { AuthContext, UserI } from "../contexts/Auth";
-import { useQuery } from "@tanstack/react-query";
-import { getProfileApi } from "../services/api/User";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { followUserApi, getProfileApi } from "../services/api/User";
 import Layout from "../components/Layout";
 
 export default function Profile() {
@@ -26,27 +27,31 @@ export default function Profile() {
   const token = context.token;
 
   const { userId } = useParams()
+  const queryClient = useQueryClient()
 
   const { isLoading, data } = useQuery({
     queryKey: ["profile", { token, userId: user?._id, searchId: userId }],
     queryFn: getProfileApi,
   });
 
+  const { mutate } = useMutation({
+    mutationFn: followUserApi,
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries("profile");
+    },
+  });
+
   const handleFollow = async () => {
-    // handle follow
+    mutate({
+      userId: user?._id,
+      token,
+      body: { followingUserId: userId }
+    })
   };
-
-  const handleUnfollow = async () => {
-    // handle unfollow
-  };
-
-  function hideFollow() {
-    // hide follow
-  }
-
-  function isFollowVisible() {
-    // is follow visible
-  }
 
   return (
     <Layout>
@@ -95,21 +100,15 @@ export default function Profile() {
                   borderRadius: "50%",
                 }}
               >
-                <img
-                  width="150px"
+                <Avatar
+                  sx={{ width: 120, height: 120}}
                   src={data && data.data.profile?.profileUrl}
                   alt="profile"
                 />
               </Box>
             </Box>
             <Box textAlign="right" padding="10px 20px">
-              <IconButton>
-                <MoreHorizIcon />
-              </IconButton>
-              <IconButton>
-                <MailOutlineIcon />
-              </IconButton>
-              <Button
+            {data && data.data.profile._id !== user?._id && <Button
                 onClick={handleFollow}
                 size="small"
                 sx={{
@@ -122,25 +121,10 @@ export default function Profile() {
                   },
                 }}
                 variant="contained"
+                disabled={data?.data.isFollowing}
               >
-                Follow
-              </Button>
-              <Button
-                onClick={handleUnfollow}
-                size="small"
-                sx={{
-                  borderRadius: theme.shape.borderRadius,
-                  textTransform: "capitalize",
-                  padding: "6px 20px",
-                  background: "black",
-                  "&:hover": {
-                    background: "#333",
-                  },
-                }}
-                variant="contained"
-              >
-                Unfollow
-              </Button>
+                {data?.data.isFollowing ? "Following" : "Follow"}
+              </Button>}
             </Box>
             <Box padding="10px 20px">
               <Typography variant="h6" sx={{ fontWeight: "500" }}>

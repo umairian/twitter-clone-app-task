@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import Users from "../models/user.model";
+import Followers from "../models/follower.model";
 import utils from "../utils";
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-import config from "../config"
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import config from "../config";
 
 export default {
   create: async (req: Request, res: Response) => {
@@ -28,7 +29,12 @@ export default {
       const salt = await bcrypt.genSalt(12);
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      let user = await Users.create({ name, email, password: hashedPassword, profileUrl });
+      let user = await Users.create({
+        name,
+        email,
+        password: hashedPassword,
+        profileUrl,
+      });
 
       user = user.toJSON();
       user.password = "";
@@ -70,7 +76,7 @@ export default {
         });
       }
 
-      user = user.toJSON()
+      user = user.toJSON();
       user.password = "";
 
       const token = jwt.sign(user, config.jwtSecret);
@@ -87,12 +93,21 @@ export default {
     try {
       const { userId } = req.query;
 
-      const profile = await Users.findById(userId).populate({
-        path: "posts",
-        options: { sort: { createdAt: "desc" } },
-      }).populate("followers").populate("following")
+      const profile = await Users.findById(userId)
+        .populate({
+          path: "posts",
+          options: { sort: { createdAt: "desc" } },
+        })
+        .populate("followers")
+        .populate("following");
 
-      return res.status(200).send({ profile });
+      const isFollowing = profile?.followers.find(
+        (follower) => follower._id.toString() === req.user._id.toString()
+      )
+        ? true
+        : false;
+
+      return res.status(200).send({ profile, isFollowing });
     } catch (err: any) {
       console.log(err);
       return res
@@ -107,10 +122,41 @@ export default {
 
       const users = await Users.find({
         _id: { $ne: req.user._id },
-        name: { $regex: term, $options: 'i' }
-      })
+        name: { $regex: term, $options: "i" },
+      });
 
       return res.status(200).send({ users });
+    } catch (err: any) {
+      console.log(err);
+      return res
+        .status(err.status || 500)
+        .send(err.message || "Something went wrong!");
+    }
+  },
+  follow: async (req: Request, res: Response) => {
+    try {
+      const { body, user } = req;
+      const { followingUserId } = body;
+
+      await Followers.create({
+        follower: user._id,
+        following: followingUserId,
+      });
+
+      await Promise.all([
+        Users.findByIdAndUpdate(
+          user._id,
+          { $push: { following: followingUserId } },
+          { new: true, useFindAndModify: false }
+        ),
+        Users.findByIdAndUpdate(
+          followingUserId,
+          { $push: { followers: user._id } },
+          { new: true, useFindAndModify: false }
+        ),
+      ]);
+
+      return res.status(200).send("Successfull");
     } catch (err: any) {
       console.log(err);
       return res
